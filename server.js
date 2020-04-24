@@ -128,7 +128,7 @@ app.use('/status', (req, res) => {
     info: {
       timeStarted: Math.round(startDate.getTime()),
       activeConnections: activeSockets().length,
-      rooms,
+      rooms: rooms.length,
     },
   }
   res.json(status)
