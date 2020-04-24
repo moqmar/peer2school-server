@@ -25,6 +25,9 @@ process.title = CONFIG.title
 
 const log = require('debug')('signal:server')
 
+const nanoid = require('nanoid').nanoid
+const crypto = require('crypto')
+
 app.use(helmet())
 app.use(cors())
 
@@ -132,6 +135,26 @@ app.use('/status', (req, res) => {
     },
   }
   res.json(status)
+})
+
+app.use('/peers.json', (req, res) => {
+  let username = process.env.TURN_USERNAME
+  let credential = process.env.TURN_PASSWORD
+  if (process.env.TURN_SECRET) {
+  	// Use a shared secret instead of username & password, see https://www.mankier.com/1/turnserver#Turn_Rest_API
+    let temporaryUsername = nanoid(32)
+  	username = Math.floor(new Date().getTime() / 1000) + ":" + temporaryUsername
+  	credential = crypto.createHmac('sha1', process.env.TURN_SECRET).update(temporaryUsername).digest('base64')
+  }
+  res.json({
+  	iceServers: [{
+  		urls: "stun:" + (process.env.STUN || process.env.COTURN || "stun.linphone.org:3478"),
+  	}, {
+  		urls: "turn:" + (process.env.TURN || process.env.COTURN),
+  		username,
+  		credential,
+  	}]
+  })
 })
 
 if (process.env.UI) {
