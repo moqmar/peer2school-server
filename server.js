@@ -134,8 +134,12 @@ app.use('/status', (req, res) => {
   res.json(status)
 })
 
-app.use('/', (req, res) => {
-  res.send(`<!DOCTYPE html>
+if (process.env.UI) {
+  // add an environment variable to serve a static UI, e.g. UI=/var/www/briefing
+  app.use('/', express.static(process.env.UI))
+} else {
+  app.use('/', (req, res) => {
+    res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -152,9 +156,8 @@ app.use('/', (req, res) => {
   <p>Running since ${startDate.toISOString()}</p>  
 </body>
 </html>`)
-})
-
-// app.use('/', express.static('public'))
+  })
+}
 
 //
 
