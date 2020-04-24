@@ -143,7 +143,7 @@ app.use('/peers.json', (req, res) => {
   let credential = process.env.TURN_PASSWORD
   if (process.env.TURN_SECRET) {
     // Check if this referrer is allowed to use this TURN server (for WebRTC)
-    if (!turnWhitelist.contains((req.get("Referrer") || "").match(/^(?:.*:\/\/)?([^/]*)/)[1])) {
+    if (!turnWhitelist.contains((req.get("Referer") || "").match(/^(?:.*:\/\/)?([^/]*)/)[1])) {
       return res.status(403).json({"error": "Referrer not allowed."});
     }
   	// Use a shared secret instead of username & password, see https://www.mankier.com/1/turnserver#Turn_Rest_API
@@ -152,13 +152,15 @@ app.use('/peers.json', (req, res) => {
   	credential = crypto.createHmac('sha1', process.env.TURN_SECRET).update(temporaryUsername).digest('base64')
   }
   res.json({
+    iceTransportPolicy: 'all',
+    reconnectTimer: 3000,
   	iceServers: [{
   		urls: "stun:" + (process.env.STUN || process.env.COTURN || "stun.linphone.org:3478"),
   	}, {
   		urls: "turn:" + (process.env.TURN || process.env.COTURN),
   		username,
   		credential,
-  	}]
+  	}],
   })
 })
 
