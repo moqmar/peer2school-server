@@ -137,10 +137,15 @@ app.use('/status', (req, res) => {
   res.json(status)
 })
 
+const turnWhitelist = process.env.TURN_WHITELIST ? process.env.TURN_WHITELIST.split(",") : [];
 app.use('/peers.json', (req, res) => {
   let username = process.env.TURN_USERNAME
   let credential = process.env.TURN_PASSWORD
   if (process.env.TURN_SECRET) {
+    // Check if this referrer is allowed to use this TURN server (for WebRTC)
+    if (!turnWhitelist.contains((req.get("Referrer") || "").match(/^(?:.*:\/\/)?([^/]*)/)[1])) {
+      return res.status(403).json({"error": "Referrer not allowed."});
+    }
   	// Use a shared secret instead of username & password, see https://www.mankier.com/1/turnserver#Turn_Rest_API
     let temporaryUsername = nanoid(32)
   	username = Math.floor(new Date().getTime() / 1000) + ":" + temporaryUsername
