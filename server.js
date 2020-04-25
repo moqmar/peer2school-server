@@ -155,9 +155,9 @@ app.use('/peers.json', (req, res) => {
     iceTransportPolicy: 'all',
     reconnectTimer: 3000,
   	iceServers: [{
-  		urls: "stun:" + (process.env.STUN || process.env.COTURN || "stun.linphone.org:3478"),
+  		urls: "stun:" + (process.env.STUN || process.env.TURN),
   	}, {
-  		urls: "turn:" + (process.env.TURN || process.env.COTURN),
+  		urls: "turn:" + process.env.TURN,
   		username,
   		credential,
   	}],
