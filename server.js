@@ -147,9 +147,8 @@ app.use('/peers.json', (req, res) => {
       return res.status(403).json({"error": "Referrer not allowed."});
     }
   	// Use a shared secret instead of username & password, see https://www.mankier.com/1/turnserver#Turn_Rest_API
-    let temporaryUsername = nanoid(32)
-  	username = Math.floor(new Date().getTime() / 1000) + ":" + temporaryUsername
-  	credential = crypto.createHmac('sha1', process.env.TURN_SECRET).update(temporaryUsername).digest('base64')
+    username = (Math.floor(new Date().getTime() / 1000) + 21600) + ":" + nanoid(32)
+    credential = crypto.createHmac('sha1', process.env.TURN_SECRET).update(username).digest('base64')
   }
   res.json({
     iceTransportPolicy: 'all',
