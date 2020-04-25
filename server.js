@@ -167,6 +167,7 @@ app.use('/peers.json', (req, res) => {
 if (process.env.UI) {
   // add an environment variable to serve a static UI, e.g. UI=/var/www/briefing
   app.use('/', express.static(process.env.UI))
+  app.get('/:id', (req, res) => res.sendFile(process.env.UI + "/index.html"))
 } else {
   app.use('/', (req, res) => {
     res.send(`<!DOCTYPE html>
